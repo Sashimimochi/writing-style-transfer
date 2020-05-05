@@ -64,6 +64,7 @@ def save_model(g, modal_name):
     :param g
     :param modal_name
     """
+    print_message('Save Model: {}'.format(model_name))
     torch.save(g.state_dict(), get_model_path_by_epoch(modal_name))
 
 
@@ -74,6 +75,7 @@ def load_model(model, name, device_type):
     :param name
     :param device_type: cuda or cpu
     """
+    print_message('Load Model: {}'.format(name))
     model.load_state_dict(torch.load(get_model_path_by_epoch(name), map_location=device_type))
 
 
@@ -110,6 +112,8 @@ def save_stats(loss_gan_ab, loss_gan_ba, bleu_score_a, bleu_score_b):
     :param bleu_score_a
     :param bleu_score_b
     """
-    with open('./stats.csv', mode='a') as status_file:
+    filepath = './stats.csv'
+    print_message('Save Status at {}'.format(filepath))
+    with open(filepath, mode='a') as status_file:
         status_writer = csv.writer(status_file)
         status_writer.writerow([loss_gan_ab, loss_gan_ba, bleu_score_a, bleu_score_b])

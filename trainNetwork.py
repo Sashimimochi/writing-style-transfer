@@ -5,6 +5,7 @@ from GAN.CycleGan import get_cycle_gan_network, get_criterions, get_optimizers, 
 from constants import g_clip
 from GAN.train import train_generators, train_cycle
 from Utils.DatasetLoader import load_dataset
+from Utils.Services import print_message
 
 torch.backends.cudnn.benchmark = True
 torch.backends.cudnn.enabled = True
@@ -36,8 +37,6 @@ def main():
 
     G_INPUT_DIM = len(source.vocab)
     G_OUTPUT_DIM = len(source.vocab)
-
-    print('G_INPUT_DIM:', G_INPUT_DIM, 'G_OUTPUT_DIM:', G_OUTPUT_DIM)
 
     SOS_IDX = source.vocab.stoi['<sos>']
     PAD_IDX = source.vocab.stoi['<pad>']
@@ -71,6 +70,7 @@ def main():
             optimizer_g_ba,
             device
         )
+        print_message('End Pre-Training of Generator Model.')
 
     train_cycle(
         opt.start_epoch,
@@ -96,6 +96,7 @@ def main():
         lr_scheduler_d_a,
         lr_scheduler_d_b
     )
+    print_message('End Training of CycleGan Model.')
 
 
 if __name__ == "__main__":
