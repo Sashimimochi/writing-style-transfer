@@ -58,14 +58,14 @@ def get_model_path_by_epoch(model_name):
     return f"{MODELS_FOLDER}/{model_name}.pth"
 
 
-def save_model(g, modal_name):
+def save_model(g, model_name):
     """
     Save the model
     :param g
     :param modal_name
     """
     print_message('Save Model: {}'.format(model_name))
-    torch.save(g.state_dict(), get_model_path_by_epoch(modal_name))
+    torch.save(g.state_dict(), get_model_path_by_epoch(model_name))
 
 
 def load_model(model, name, device_type):
