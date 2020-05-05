@@ -183,10 +183,12 @@ def train_generators(
         if valid_loss_ab < best_valid_loss_ab:
             best_valid_loss_ab = valid_loss_ab
             save_model(g_ab, MODEL_NAME_G_AB)
+            print_message('Save Generator Model: {}'.format(MODEL_NAME_G_AB))
 
         if valid_loss_ba < best_valid_loss_ba:
             best_valid_loss_ba = valid_loss_ba
             save_model(g_ba, MODEL_NAME_G_BA)
+            print_message('Save Generator Model: {}'.format(MODEL_NAME_G_BA))
 
         print_message(f'Epoch: {epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s')
         print_message(f'\tTrain Loss AB: {train_loss_ab:.3f} | Train PPL: {math.exp(train_loss_ab):7.3f}')
@@ -494,11 +496,15 @@ def train_cycle(
         # Save models
         save_model(d_a, MODEL_NAME_D_A)
         save_model(d_b, MODEL_NAME_D_B)
+        print_message('Save Discriminator Model: {}'.format(MODEL_NAME_D_A))
+        print_message('Save Discriminator Model: {}'.format(MODEL_NAME_D_B))
 
         if loss_gan_ab < best_loss_ab:
             best_loss_ab = loss_gan_ab
             save_model(g_ab, MODEL_NAME_G_AB)
+            print_message('Save Generator Model: {}'.format(MODEL_NAME_G_AB))
 
         if loss_gan_ba < best_loss_ba:
             best_loss_ba = loss_gan_ba
             save_model(g_ba, MODEL_NAME_G_BA)
+            print_message('Save Generator Model: {}'.format(MODEL_NAME_G_BA))

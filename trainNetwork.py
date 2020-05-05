@@ -37,6 +37,8 @@ def main():
     G_INPUT_DIM = len(source.vocab)
     G_OUTPUT_DIM = len(source.vocab)
 
+    print('G_INPUT_DIM:', G_INPUT_DIM, 'G_OUTPUT_DIM:', G_OUTPUT_DIM)
+
     SOS_IDX = source.vocab.stoi['<sos>']
     PAD_IDX = source.vocab.stoi['<pad>']
 
