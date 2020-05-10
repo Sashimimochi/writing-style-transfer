@@ -3,7 +3,7 @@ import torch
 import math
 from tqdm import tqdm
 
-from Utils.Services import print_message, get_time, get_bleu_score, save_model, save_stats
+from Utils.Services import print_message, get_time, get_bleu_score, save_model, save_pretrain_stats, save_stats, save_train_loss
 from constants import MODEL_NAME_G_AB, MODEL_NAME_G_BA, MODEL_NAME_D_A, MODEL_NAME_D_B
 
 
@@ -193,7 +193,7 @@ def train_generators(
         print_message(f'\tTrain Loss BA: {train_loss_ba:.3f} | Train PPL: {math.exp(train_loss_ba):7.3f}')
         print_message(f'\tVal. Loss AB: {valid_loss_ab:.3f} | Val. PPL: {math.exp(valid_loss_ab):7.3f}')
         print_message(f'\tVal. Loss BA: {valid_loss_ba:.3f} | Val. PPL: {math.exp(valid_loss_ba):7.3f}')
-
+        save_pretrain_stats(train_loss_ab, train_loss_ba, valid_loss_ab, valid_loss_ba)
 
 def train_cycle_gan_epoch(
         device,
@@ -328,6 +328,7 @@ def train_cycle_gan_epoch(
             if i == len(data_iterator) - 1:
                 print_message(
                     f'[Batch {i + 1}/{len(data_iterator)}] [D loss: {loss_d}] [G loss: {loss_g.item()}, adv: {loss_gan}, cycle: {loss_cycle}, identity: {loss_identity}]')
+                save_train_loss(loss_d, loss_g.item(), loss_gan, loss_cycle.item(), loss_identity)
 
 
 def evaluate_cycle_gan(

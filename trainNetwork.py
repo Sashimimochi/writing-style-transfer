@@ -12,7 +12,7 @@ torch.backends.cudnn.enabled = True
 
 cuda = torch.cuda.is_available()
 device = torch.device('cuda' if cuda else 'cpu')
-
+print_message('Use device: {}'.format(device))
 
 def main():
     parser = argparse.ArgumentParser()
@@ -30,10 +30,11 @@ def main():
                         help="should load the pre train generators")
     parser.add_argument("--should_load_pretrain_discriminators", type=bool, default=False,
                         help="should load the pre train discriminators")
+    parser.add_argument("--lang_type", type=str, default="en", help="select language type")
     opt = parser.parse_args()
 
     # Load the Dataset
-    source, iterators = load_dataset(opt.batch_size, device)
+    source, iterators = load_dataset(opt.batch_size, device, opt.lang_type)
 
     G_INPUT_DIM = len(source.vocab)
     G_OUTPUT_DIM = len(source.vocab)

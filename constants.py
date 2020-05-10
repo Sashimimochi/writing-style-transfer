@@ -1,4 +1,4 @@
-DATASET_NAME = 'YelpDatasets'
+DATASET_NAME = 'mydata'#'YelpDatasets'
 
 DATA_FOLDER = f'.data/{DATASET_NAME}'
 MODELS_FOLDER = f'saved_models/{DATASET_NAME}'

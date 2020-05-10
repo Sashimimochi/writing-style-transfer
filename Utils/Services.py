@@ -6,6 +6,8 @@ from constants import MODELS_FOLDER
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 import numpy as np
 import csv
+import os
+
 
 logging.basicConfig(filename='app.log', level=logging.DEBUG)
 
@@ -103,6 +105,38 @@ def get_bleu_score(source, real, fake):
     return np.mean([sentence_bleu([real_text[i]], fake_text[i], smoothing_function=smoother.method4) * 100 for i in
                     range(len(real_text))])
 
+def save_pretrain_stats(train_loss_ab, train_loss_ba, valid_loss_ab, valid_loss_ba):
+    """
+    Save Pre-train statistics
+    :param train_loss_ab
+    :param train_loss_ba
+    :param valid_loss_ab
+    :param valid_loss_ba
+    """
+    filepath = './pretrain_stats.csv'
+    print_message('Save Pre-Train Stats at {}'.format(filepath))
+    with open(filepath, mode='a') as status_file:
+        status_writer = csv.writer(status_file)
+        if os.path.getsize(filepath) == 0:
+            status_writer.writerow(['train_loss_ab', 'train_loss_ba', 'valid_loss_ab', 'valid_loss_ba', 'train_ppl_ab', 'train_ppl_ba', 'valid_ppl_ab', 'valid_ppl_ba'])
+        status_writer.writerow([train_loss_ab, train_loss_ba, valid_loss_ab, valid_loss_ba, np.exp(train_loss_ab), np.exp(train_loss_ba), np.exp(valid_loss_ab), np.exp(valid_loss_ba)])
+
+def save_train_loss(loss_d, loss_g, loss_gan, loss_cycle, loss_identity):
+    """
+    Save statistics
+    :param loss_d
+    :param loss_g
+    :param loss_gan
+    :param loss_cycle
+    :param loss_identity
+    """
+    filepath = './train_loss.csv'
+    print_message('Save Train Loss at {}'.format(filepath))
+    with open(filepath, mode='a') as status_file:
+        status_writer = csv.writer(status_file)
+        if os.path.getsize(filepath) == 0:
+            status_writer.writerow(['loss_d', 'loss_g', 'loss_gan', 'loss_cycle', 'loss_identity'])
+        status_writer.writerow([loss_d, loss_g, loss_gan, loss_cycle, loss_identity])
 
 def save_stats(loss_gan_ab, loss_gan_ba, bleu_score_a, bleu_score_b):
     """
@@ -112,8 +146,10 @@ def save_stats(loss_gan_ab, loss_gan_ba, bleu_score_a, bleu_score_b):
     :param bleu_score_a
     :param bleu_score_b
     """
-    filepath = './stats.csv'
-    print_message('Save Status at {}'.format(filepath))
+    filepath = './cyclegan_stats.csv'
+    print_message('Save Stats at {}'.format(filepath))
     with open(filepath, mode='a') as status_file:
         status_writer = csv.writer(status_file)
+        if os.path.getsize(filepath) == 0:
+            status_writer.writerow(['loss_gan_ab', 'loss_gan_ba', 'bleu_score_a', 'bleu_score_b'])
         status_writer.writerow([loss_gan_ab, loss_gan_ba, bleu_score_a, bleu_score_b])

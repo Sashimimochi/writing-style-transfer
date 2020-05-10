@@ -1,7 +1,9 @@
+# coding: utf-8
 import torch
 import csv
 import nltk
 import os
+import ginza
 
 import pandas as pd
 import numpy as np
@@ -12,8 +14,6 @@ from nltk.corpus import stopwords
 from tqdm import tqdm
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 
-nltk.download('stopwords')
-
 from GAN.train import evaluate_cycle_gan
 from GAN.CycleGan import get_cycle_gan_network, get_criterions, get_optimizers, get_schedulers
 from Utils.DatasetLoader import load_dataset
@@ -22,7 +22,18 @@ from constants import DATA_FOLDER, POSITIVE_FILE_EXTENSION, NEGATIVE_FILE_EXTENS
 
 
 batch_size = 16
-stop_words = stopwords.words('english')
+LANG = 'ja'
+
+if LANG == 'ja':
+    import io, sys
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    stop_words = list(ginza.STOP_WORDS)
+    stopwords.words_org = stopwords.words
+    stopwords.words = lambda lang: stop_words if lang == 'japanese' else stopwords.words_org(lang)
+else:
+    nltk.download('stopwords')
+    stop_words = stopwords.words('english')
+
 
 def configure_plotly_browser_state():
     import IPython
@@ -185,17 +196,17 @@ def bleu_score(df_ab_bleu_by_length, df_ba_bleu_by_length):
 
 def main():
     device = get_device()
-    source, iterators = load_dataset(batch_size, device)
+    source, iterators = load_dataset(batch_size, device, lang='ja')
     train_iterator, validation_iterator, test_iterator = iterators
     G_INPUT_DIM = len(source.vocab)
     G_OUTPUT_DIM = len(source.vocab)
     SOS_IDX = source.vocab.stoi['<sos>']
     PAD_IDX = source.vocab.stoi['<pad>']
 
-    #explore_the_data()
+    explore_the_data(DATASET_TYPES, POSITIVE_FILE_EXTENSION, NEGATIVE_FILE_EXTENSION)
     g_ab, g_ba, d_a, d_b = prepare_the_networks(G_INPUT_DIM, G_OUTPUT_DIM, device, PAD_IDX, SOS_IDX)
-    #display_the_models(g_ab, d_a)
-    #test_the_generators(PAD_IDX, device, source, g_ab, g_ba, d_a, d_b, iterators)
+    display_the_models(g_ab, d_a)
+    test_the_generators(PAD_IDX, device, source, g_ab, g_ba, d_a, d_b, iterators)
     res_ab, res_ba = display_results(d_a, d_b, test_iterator, device, g_ab, g_ba, source)
     df_ab_bleu_by_length = generator_positive_to_negative_results(res_ab)
     df_ba_bleu_by_length = generator_negative_to_positive_results(res_ba)

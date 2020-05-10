@@ -34,7 +34,7 @@ class DataProcessor:
         :param output_path
         """
         sentences = DataProcessor.clean_sentences(sentences)
-        with open(output_path, 'a+') as out:
+        with open(output_path, 'a+', encoding='utf-8') as out:
             for sentence in sentences:
                 out.write(sentence)
                 out.write("\n")
@@ -51,8 +51,8 @@ class DataProcessor:
                 .replace('\r\n', '')
                 .replace('\r', '')
                 .replace('\n', '')
-                .encode('ascii', 'ignore')
-                .decode()
+                #.encode('ascii', 'ignore')
+                #.decode()
                 .lower()
             for sentence in sentences
         ]
@@ -103,7 +103,6 @@ class DataProcessor:
                 try:
                     review = json.loads(line)
                     sentences = DataProcessor.clean_data(re.split(SPLIT_SENTENCES_REGEX, review[TEXT_FIELD]))
-
                     # we filter out reviews that exceed 10 sentences
                     if len(sentences) > self.num_of_sentences_limit:
                         continue
@@ -118,7 +117,7 @@ class DataProcessor:
                     elif review[STARS_FIELD] <= self.negative_review_stars_limit:
                         self.process_negative_sentences(sentences)
                 except Exception as e:  # non unicode chars
-                    pass
+                    print('[ERROR]', e)
 
     def process_positive_sentences(self, sentences):
         DataProcessor.process_sentences(sentences, output_path=self.get_random_dataset_path(POSITIVE_FILE_EXTENSION))

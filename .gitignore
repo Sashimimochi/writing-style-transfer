@@ -104,3 +104,6 @@ venv.bak/
 .mypy_cache/
 
 yelp_academic_dataset_review.json
+
+.DS_Store
+mydata/
