@@ -14,7 +14,7 @@ class MakeJaDataset:
         data = []
         with open(filepath, 'r', encoding='utf-8') as f:
             for line in f.readlines():
-                data.append('{{"stars": {label}, "text": "{text}"}}'.format(label=label, text=line.rstrip('\n')))
+                data.append('{{"stars": {label}, "text": "{text}"}}'.format(label=label, text=line.rstrip('\n').replace('"', '')))
 
         return data
 

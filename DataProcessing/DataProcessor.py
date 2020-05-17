@@ -4,6 +4,8 @@ import os
 import random
 import re
 import shutil
+import spacy
+
 
 from tqdm import tqdm
 
@@ -69,7 +71,8 @@ class DataProcessor:
             min_num_of_words_limit,
             max_num_of_words_limit,
             test_size,
-            validation_size
+            validation_size,
+            lang='en'
     ):
         self.positive_review_stars_limit = positive_review_stars_limit
         self.negative_review_stars_limit = negative_review_stars_limit
@@ -78,6 +81,9 @@ class DataProcessor:
         self.max_num_of_words_limit = max_num_of_words_limit
         self.dataset_random_array = []
         self.init_dataset_random_array(test_size, validation_size)
+        self.lang = lang
+        if lang == 'ja':
+            self.spacy_ja = spacy.load('ja_ginza')
 
     def init_dataset_random_array(self, test_size, validation_size):
         test_items = int(test_size * 100)
@@ -85,6 +91,13 @@ class DataProcessor:
         self.dataset_random_array = test_items * [TEST_TYPE] + \
                                     validation_items * [VALIDATION_TYPE] + \
                                     (100 - test_items - validation_items) * [TRAIN_TYPE]
+
+    def tokenize_ja(self, text):
+        """
+        Tokenizes Japanese text from a string into a list of strings (tokens)
+        """
+        return [tok.text for tok in self.spacy_ja.tokenizer(text)]
+
 
     def process_data(self, path):
         """
@@ -109,14 +122,20 @@ class DataProcessor:
 
                     # We filter the sentences that exceed self.max_num_of_words_limit words and
                     # less than self.min_num_of_words_limit words
-                    sentences = [sentence for sentence in sentences if
+                    if self.lang=='ja':
+                        sentences = [sentence for sentence in sentences if
+                                 self.max_num_of_words_limit > len(self.tokenize_ja(sentence)) > self.min_num_of_words_limit]
+                    else:
+                        sentences = [sentence for sentence in sentences if
                                  self.max_num_of_words_limit > len(sentence.split()) > self.min_num_of_words_limit]
 
                     if review[STARS_FIELD] >= self.positive_review_stars_limit:
                         self.process_positive_sentences(sentences)
                     elif review[STARS_FIELD] <= self.negative_review_stars_limit:
                         self.process_negative_sentences(sentences)
-                except Exception as e:  # non unicode chars
+                except json.decoder.JSONDecodeError as e:  # non unicode chars
+                    with open('log.txt', 'a', encoding='utf-8') as f:
+                        f.write(line)
                     print('[ERROR]', e)
 
     def process_positive_sentences(self, sentences):

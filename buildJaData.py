@@ -53,6 +53,11 @@ def main():
                         default="mydata/mydata.json",
                         help="path of the dataset"
                         )
+    parser.add_argument("--lang",
+                        type=str,
+                        default="ja",
+                        help="language"
+                        )
 
     opt = parser.parse_args()
 
@@ -66,6 +71,7 @@ def main():
         opt.max_num_of_words_limit,
         opt.test_size,
         opt.validation_size,
+        opt.lang
     )
     data_processor.process_data(opt.dataset_path)
 
